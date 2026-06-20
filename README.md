@@ -12,7 +12,7 @@ Anonymous confession/community board for FUT Minna built with React + Express + 
 ### 1) Backend
 
 ```bash
-cd /home/runner/work/fut-confession/fut-confession/server
+cd server
 cp .env.example .env
 npm install
 npm run dev
@@ -21,7 +21,7 @@ npm run dev
 ### 2) Frontend
 
 ```bash
-cd /home/runner/work/fut-confession/fut-confession/client
+cd client
 cp .env.example .env
 npm install
 npm run dev
@@ -29,7 +29,7 @@ npm run dev
 
 ## Root Scripts
 
-From `/home/runner/work/fut-confession/fut-confession`:
+From project root:
 
 - `npm run dev:client` - run frontend
 - `npm run dev:server` - run backend
@@ -48,7 +48,7 @@ Base URL: `http://localhost:5000/api`
 - `PATCH /confessions/:id/vote` - vote on confession
   - body: `{ "direction": "up" | "down" }`
 - `PATCH /confessions/:id/flag` - flag confession
-- `GET /confessions/admin` - flagged confessions (admin dashboard)
+- `GET /confessions/admin` - flagged confessions (requires `x-admin-key`)
 
 ## MVP Features Implemented
 
@@ -57,9 +57,23 @@ Base URL: `http://localhost:5000/api`
 - Upvote/downvote with trending/newest sorting
 - Basic moderation via flagging + admin dashboard toggle
 
+## Environment Variables
+
+Backend (`server/.env`):
+
+- `PORT`
+- `MONGODB_URI`
+- `CLIENT_ORIGIN`
+- `ADMIN_KEY`
+
+Frontend (`client/.env`):
+
+- `VITE_API_URL`
+- `VITE_ADMIN_KEY` (must match backend `ADMIN_KEY` for admin dashboard)
+
 ## Deployment Notes
 
 - Frontend: Vercel (`client` root)
 - Backend: Railway/Heroku (`server` root)
 - Set `VITE_API_URL` on frontend to your deployed backend `/api` URL
-- Set `MONGODB_URI`, `CLIENT_ORIGIN`, and `PORT` on backend
+- Set `MONGODB_URI`, `CLIENT_ORIGIN`, `ADMIN_KEY`, and `PORT` on backend

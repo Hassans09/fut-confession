@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import './App.css'
 
 const API_URL = import.meta.env.VITE_API_URL || '/api'
+const ADMIN_KEY = import.meta.env.VITE_ADMIN_KEY || ''
 
 const relativeTime = (dateValue) => {
   const date = new Date(dateValue)
@@ -58,7 +59,9 @@ function App() {
 
     try {
       const endpoint = adminMode ? '/confessions/admin' : `/confessions?sort=${sort}`
-      const data = await request(endpoint)
+      const data = await request(endpoint, {
+        headers: adminMode && ADMIN_KEY ? { 'x-admin-key': ADMIN_KEY } : undefined,
+      })
       setPosts(data)
       setError('')
     } catch (fetchError) {
@@ -159,11 +162,12 @@ function App() {
             <option value="trending">Trending</option>
           </select>
         </label>
-        <button type="button" onClick={() => setAdminMode((value) => !value)}>
+        <button type="button" onClick={() => setAdminMode((value) => !value)} disabled={!ADMIN_KEY && !adminMode}>
           {adminMode ? 'Exit admin dashboard' : 'Admin dashboard'}
         </button>
       </section>
 
+      {!ADMIN_KEY ? <p className="status">Set VITE_ADMIN_KEY to use admin dashboard.</p> : null}
       {error ? <p className="error">{error}</p> : null}
       {isLoading ? <p className="status">Loading confessions...</p> : null}
 

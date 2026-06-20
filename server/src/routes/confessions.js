@@ -1,7 +1,36 @@
 const express = require('express')
+const { rateLimit } = require('express-rate-limit')
 const Confession = require('../models/Confession')
 
 const router = express.Router()
+
+const readLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+})
+
+const writeLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+})
+
+const requireAdminKey = (req, res, next) => {
+  const expectedAdminKey = process.env.ADMIN_KEY
+
+  if (!expectedAdminKey) {
+    return res.status(503).json({ message: 'Admin dashboard is not configured.' })
+  }
+
+  if (req.get('x-admin-key') !== expectedAdminKey) {
+    return res.status(403).json({ message: 'Forbidden.' })
+  }
+
+  return next()
+}
 
 const toPublicConfession = (confession) => ({
   id: confession._id,
@@ -10,6 +39,8 @@ const toPublicConfession = (confession) => ({
   flags: confession.flags,
   createdAt: confession.createdAt,
 })
+
+router.use(readLimiter)
 
 router.get('/', async (req, res, next) => {
   try {
@@ -21,7 +52,7 @@ router.get('/', async (req, res, next) => {
   }
 })
 
-router.post('/', async (req, res, next) => {
+router.post('/', writeLimiter, async (req, res, next) => {
   try {
     const text = typeof req.body.text === 'string' ? req.body.text.trim() : ''
 
@@ -30,13 +61,13 @@ router.post('/', async (req, res, next) => {
     }
 
     const confession = await Confession.create({ text })
-    res.status(201).json(toPublicConfession(confession))
+    return res.status(201).json(toPublicConfession(confession))
   } catch (error) {
-    next(error)
+    return next(error)
   }
 })
 
-router.patch('/:id/vote', async (req, res, next) => {
+router.patch('/:id/vote', writeLimiter, async (req, res, next) => {
   try {
     const direction = req.body.direction === 'down' ? -1 : req.body.direction === 'up' ? 1 : 0
 
@@ -54,13 +85,13 @@ router.patch('/:id/vote', async (req, res, next) => {
       return res.status(404).json({ message: 'Confession not found.' })
     }
 
-    res.json(toPublicConfession(confession))
+    return res.json(toPublicConfession(confession))
   } catch (error) {
-    next(error)
+    return next(error)
   }
 })
 
-router.patch('/:id/flag', async (req, res, next) => {
+router.patch('/:id/flag', writeLimiter, async (req, res, next) => {
   try {
     const confession = await Confession.findByIdAndUpdate(
       req.params.id,
@@ -72,18 +103,18 @@ router.patch('/:id/flag', async (req, res, next) => {
       return res.status(404).json({ message: 'Confession not found.' })
     }
 
-    res.json(toPublicConfession(confession))
+    return res.json(toPublicConfession(confession))
   } catch (error) {
-    next(error)
+    return next(error)
   }
 })
 
-router.get('/admin', async (req, res, next) => {
+router.get('/admin', requireAdminKey, async (req, res, next) => {
   try {
     const confessions = await Confession.find({ flags: { $gt: 0 } }).sort({ flags: -1, createdAt: -1 }).lean()
-    res.json(confessions.map(toPublicConfession))
+    return res.json(confessions.map(toPublicConfession))
   } catch (error) {
-    next(error)
+    return next(error)
   }
 })
 
