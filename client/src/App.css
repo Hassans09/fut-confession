@@ -1,0 +1,90 @@
+.app {
+  margin: 0 auto;
+  max-width: 800px;
+  padding: 1rem;
+}
+
+header h1 {
+  margin-bottom: 0.2rem;
+}
+
+header p {
+  margin-top: 0;
+  color: #4b5563;
+}
+
+.composer textarea {
+  width: 100%;
+  min-height: 120px;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  box-sizing: border-box;
+  font: inherit;
+}
+
+.composer-actions,
+.toolbar,
+article footer,
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.composer-actions {
+  margin-top: 0.5rem;
+}
+
+button,
+select {
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 0.45rem 0.75rem;
+  font: inherit;
+  background: #fff;
+  cursor: pointer;
+}
+
+.toolbar {
+  margin: 1rem 0;
+}
+
+.feed {
+  display: grid;
+  gap: 0.75rem;
+}
+
+article {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.6rem;
+  padding: 0.85rem;
+  background: #fff;
+}
+
+article p {
+  margin-top: 0;
+  white-space: pre-wrap;
+}
+
+article footer {
+  margin-top: 0.6rem;
+  color: #6b7280;
+}
+
+.actions {
+  gap: 0.35rem;
+}
+
+.actions .flag {
+  margin-left: 0.45rem;
+}
+
+.error {
+  color: #b91c1c;
+}
+
+.status {
+  color: #6b7280;
+}
