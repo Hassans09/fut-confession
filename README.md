@@ -48,14 +48,13 @@ Base URL: `http://localhost:5000/api`
 - `PATCH /confessions/:id/vote` - vote on confession
   - body: `{ "direction": "up" | "down" }`
 - `PATCH /confessions/:id/flag` - flag confession
-- `GET /confessions/admin` - flagged confessions (requires `x-admin-key`)
 
 ## MVP Features Implemented
 
 - Anonymous confession posting (no user accounts or tracking)
 - Live/near real-time feed (polling every 10s)
 - Upvote/downvote with trending/newest sorting
-- Basic moderation via flagging + admin dashboard toggle
+- Basic moderation via flagging + admin dashboard toggle (shows flagged posts)
 
 ## Environment Variables
 
@@ -64,16 +63,14 @@ Backend (`server/.env`):
 - `PORT`
 - `MONGODB_URI`
 - `CLIENT_ORIGIN`
-- `ADMIN_KEY`
 
 Frontend (`client/.env`):
 
 - `VITE_API_URL`
-- `VITE_ADMIN_KEY` (must match backend `ADMIN_KEY` for admin dashboard)
 
 ## Deployment Notes
 
 - Frontend: Vercel (`client` root)
 - Backend: Railway/Heroku (`server` root)
 - Set `VITE_API_URL` on frontend to your deployed backend `/api` URL
-- Set `MONGODB_URI`, `CLIENT_ORIGIN`, `ADMIN_KEY`, and `PORT` on backend
+- Set `MONGODB_URI`, `CLIENT_ORIGIN`, and `PORT` on backend

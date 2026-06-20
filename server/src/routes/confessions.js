@@ -18,20 +18,6 @@ const writeLimiter = rateLimit({
   legacyHeaders: false,
 })
 
-const requireAdminKey = (req, res, next) => {
-  const expectedAdminKey = process.env.ADMIN_KEY
-
-  if (!expectedAdminKey) {
-    return res.status(503).json({ message: 'Admin dashboard is not configured.' })
-  }
-
-  if (req.get('x-admin-key') !== expectedAdminKey) {
-    return res.status(403).json({ message: 'Forbidden.' })
-  }
-
-  return next()
-}
-
 const toPublicConfession = (confession) => ({
   id: confession._id,
   text: confession.text,
@@ -40,9 +26,7 @@ const toPublicConfession = (confession) => ({
   createdAt: confession.createdAt,
 })
 
-router.use(readLimiter)
-
-router.get('/', async (req, res, next) => {
+router.get('/', readLimiter, async (req, res, next) => {
   try {
     const sort = req.query.sort === 'trending' ? { votes: -1, createdAt: -1 } : { createdAt: -1 }
     const confessions = await Confession.find().sort(sort).lean()
@@ -104,15 +88,6 @@ router.patch('/:id/flag', writeLimiter, async (req, res, next) => {
     }
 
     return res.json(toPublicConfession(confession))
-  } catch (error) {
-    return next(error)
-  }
-})
-
-router.get('/admin', requireAdminKey, async (req, res, next) => {
-  try {
-    const confessions = await Confession.find({ flags: { $gt: 0 } }).sort({ flags: -1, createdAt: -1 }).lean()
-    return res.json(confessions.map(toPublicConfession))
   } catch (error) {
     return next(error)
   }

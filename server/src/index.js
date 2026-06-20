@@ -9,9 +9,13 @@ dotenv.config()
 const app = express()
 const port = process.env.PORT || 5000
 const isProduction = process.env.NODE_ENV === 'production'
-const clientOrigin = process.env.CLIENT_ORIGIN || (!isProduction ? 'http://localhost:5173' : '')
 
-if (isProduction && !process.env.CLIENT_ORIGIN) {
+let clientOrigin = process.env.CLIENT_ORIGIN
+if (!clientOrigin && !isProduction) {
+  clientOrigin = 'http://localhost:5173'
+}
+
+if (isProduction && !clientOrigin) {
   throw new Error('CLIENT_ORIGIN must be set in production.')
 }
 
